@@ -52,15 +52,15 @@ YMGAQWidgetFactory::~YMGAQWidgetFactory()
     // NOP
 }
 
-YWE * createWE(  )
-{
-    if ( ! YWE::we() )
-    {
-        YWE * ue = new YWE( );
-    }
-
-    return YWE::we();
-}
+// YWE * createWE(  )
+// {
+//     if ( ! YWE::we() )
+//     {
+//         YWE * ue = new YWE( );
+//     }
+// 
+//     return YWE::we();
+// }
 
 
 
