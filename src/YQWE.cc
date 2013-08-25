@@ -16,49 +16,39 @@
 
 /*-/
 
-  File:         YMGAQWidgetFactory.cc
+  File:         YQWE.cc
 
-  Author:       Stefan Hundhammer <sh@suse.de>
+  Author:       Angelo Naselli <anaselli@linux.it>
 
 /-*/
 
-#include <QColorGroup>
-#define YUILogComponent "mga-qt"
-#include <yui/YUILog.h>
-
+#include "YQWE.h"
 #include "YMGAQWidgetFactory.h"
-#include <yui/qt/YQApplication.h>
-#include <yui/qt/YQUI.h>
-#include <yui/YUIException.h>
-#include <YWE.h>
+#include <YUIException.h>
 
-
-#include <string>
-
-#include "YMGA_QCBTable.h"
-
-using std::string;
-
-
-YMGAQWidgetFactory::YMGAQWidgetFactory()
-    : YMGAWidgetFactory()
+YQWE::YQWE() : YWE()
 {
-    // NOP
 }
 
-
-YMGAQWidgetFactory::~YMGAQWidgetFactory()
+YQWE::~YQWE()
 {
-    // NOP
 }
 
-
-YMGA_CBTable *
-YMGAQWidgetFactory::createTable( YWidget * parent, YTableHeader * header, YTableMode mode )
+YWidgetExtensionFactory* YQWE::createWidgetExtensionFactory()
 {
-    YMGA_QCBTable * table = new YMGA_QCBTable( parent, header, mode );
-    YUI_CHECK_NEW( table );
+  YMGAQWidgetFactory * factory = new YMGAQWidgetFactory();
+  YUI_CHECK_NEW( factory );
 
-    return table;
+  return factory;
 }
 
+YWE * createWE(  )
+{
+    if ( ! YWE::we() )
+    {
+        YQWE * ue = new YQWE( );
+        YUI_CHECK_NEW ( ue );
+    }
+
+    return YWE::we();
+}

@@ -46,7 +46,7 @@ public:
 
 protected:
 
-    friend class YQUI;
+    friend class YQWE;
 
     /**
      * Constructor.
