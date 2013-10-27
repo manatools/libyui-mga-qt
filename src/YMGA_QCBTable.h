@@ -26,7 +26,7 @@
 #define YMGA_QCBTable_h
 #include <QFrame>
 
-#include <yui/YMGA_CBTable.h>
+#include <yui/mga/YMGA_CBTable.h>
 #include <yui/qt/QY2ListView.h>
 
 

@@ -26,7 +26,7 @@
 #define YMGAQWidgetFactory_h
 
 
-#include <yui/YMGAWidgetExtensionFactory.h>
+#include <yui/mga/YMGAWidgetExtensionFactory.h>
 
 #include "YMGA_CBTable.h"
 
