@@ -1,12 +1,12 @@
 %define         git          5ded95a
-%define         gitdate      20131027
+%define         gitdate      20131029
 %define         major        5
 %define         libname      %mklibname yui %{major}-mga-qt
 %define         develname    %mklibname -d yui-mga-qt
 
 Name:           libyui-mga-qt
 Version:        1.0.0
-Release:        %mkrel -c git%{gitdate} 0
+Release:        %mkrel -c git%{gitdate} 1
 Summary:        UI abstraction library - Qt plugin
 License:        LGPLv2+
 Group:          System/Libraries
@@ -15,8 +15,8 @@ Source0:        %{name}-%{version}.tar.bz2
 
 BuildRequires:    png-devel
 BuildRequires:    yui-devel
-BuildRequires:    pkgconfig(libyui-qt)
-BuildRequires:    pkgconfig(libyui-mga)
+BuildRequires:    %{_lib}yui-qt-devel
+BuildRequires:    %{_lib}yui-mga-devel
 BuildRequires:    qt4-devel
 BuildRequires:    cmake
 BuildRequires:    boost-devel
