@@ -24,9 +24,9 @@
 
 #ifndef YQWE_h
 #define YQWE_h
-#include <YWE.h>
+#include <YExternalWidgets.h>
 
-class YQWE : public YWE
+class YQWE : public YExternalWidgets
 {
 public:
   YQWE();
@@ -34,7 +34,7 @@ public:
 
 protected:
 
-  virtual YWidgetExtensionFactory * createWidgetExtensionFactory();
+  virtual YExternalWidgetsFactory * createExternalWidgetsFactory();
 };
 
 #endif //YQWE_h

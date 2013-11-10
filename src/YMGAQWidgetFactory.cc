@@ -30,7 +30,7 @@
 #include <yui/qt/YQApplication.h>
 #include <yui/qt/YQUI.h>
 #include <yui/YUIException.h>
-#include <YWE.h>
+#include <YExternalWidgets.h>
 
 
 #include <string>
