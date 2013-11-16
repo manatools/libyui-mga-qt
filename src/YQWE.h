@@ -34,7 +34,7 @@ public:
 
 protected:
 
-  virtual YExternalWidgetsFactory * createExternalWidgetsFactory();
+  virtual YExternalWidgetFactory * createExternalWidgetFactory();
 };
 
 #endif //YQWE_h
