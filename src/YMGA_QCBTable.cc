@@ -176,7 +176,7 @@ int YMGA_QCBTable::checkboxItemColumn()
 void
 YMGA_QCBTable::setKeepSorting( bool keepSorting )
 {
-    YTable::setKeepSorting( keepSorting );
+    YMGA_CBTable::setKeepSorting( keepSorting );
     _qt_listView->setSortByInsertionSequence( keepSorting );
     _qt_listView->setSortingEnabled( ! keepSorting );
 }
@@ -197,7 +197,7 @@ YMGA_QCBTable::addItem( YItem * yitem, bool batchMode, bool resizeColumnsToConte
     YTableItem * item = dynamic_cast<YTableItem *> (yitem);
     YUI_CHECK_PTR( item );
 
-    YTable::addItem( item );
+    YMGA_CBTable::addItem( item );
 
     YMGA_QCBTableListViewItem * clone = new YMGA_QCBTableListViewItem( this, _qt_listView, item );
     YUI_CHECK_NEW( clone );
@@ -288,7 +288,7 @@ YMGA_QCBTable::selectItem( YItem * yitem, bool selected )
 	    _qt_listView->setCurrentItem( clone ); // This deselects all other items!
 
 	clone->setSelected( true );
-	YTable::selectItem( item, selected );
+	YMGA_CBTable::selectItem( item, selected );
     }
 }
 
@@ -298,7 +298,7 @@ YMGA_QCBTable::deselectAllItems()
 {
     YQSignalBlocker sigBlocker( _qt_listView );
 
-    YTable::deselectAllItems();
+    YMGA_CBTable::deselectAllItems();
     _qt_listView->clearSelection();
 }
 
@@ -307,7 +307,7 @@ void
 YMGA_QCBTable::deleteAllItems()
 {
     _qt_listView->clear();
-    YTable::deleteAllItems();
+    YMGA_CBTable::deleteAllItems();
 }
 
 
@@ -332,7 +332,7 @@ YMGA_QCBTable::selectOrigItem( QTreeWidgetItem * listViewItem )
 	YMGA_QCBTableListViewItem * tableListViewItem = dynamic_cast<YMGA_QCBTableListViewItem *> (listViewItem);
 	YUI_CHECK_PTR( tableListViewItem );
 
-	YTable::selectItem( tableListViewItem->origItem(), true );
+	YMGA_CBTable::selectItem( tableListViewItem->origItem(), true );
     }
 }
 
