@@ -485,7 +485,10 @@ YMGA_QCBTable::slotcolumnClicked(int               button,
     // it seems items contains old value when signal is emitted
     pYTableItem->setSelected(item->checkState(col)==Qt::CheckState::Unchecked);
      if ( notify() )
-        YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::ValueChanged ) );
+     {
+       YMGA_CBTable::setChangedItem(pYTableItem);
+       YQUI::ui()->sendEvent(new YWidgetEvent(this, YEvent::ValueChanged));
+     }
   } 
 }
 

@@ -54,7 +54,7 @@ YMGAQWidgetFactory::~YMGAQWidgetFactory()
 
 
 YMGA_CBTable *
-YMGAQWidgetFactory::createTable( YWidget * parent, YTableHeader * header, YTableMode mode )
+YMGAQWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header, YTableMode mode )
 {
     YMGA_QCBTable * table = new YMGA_QCBTable( parent, header, mode );
     YUI_CHECK_NEW( table );

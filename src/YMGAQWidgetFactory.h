@@ -41,7 +41,7 @@ class YMGAQWidgetFactory: public YMGAWidgetFactory
 {
 public:
 
-  virtual YMGA_CBTable * createTable ( YWidget * parent, YTableHeader * header_disown, YTableMode mode = YTableSingleLineSelection );
+  virtual YMGA_CBTable * createCBTable ( YWidget * parent, YTableHeader * header_disown, YTableMode mode = YTableCheckBoxOnFirstColumn );
 
 
 protected:
