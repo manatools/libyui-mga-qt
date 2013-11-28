@@ -25,8 +25,9 @@
 #include "YQWE.h"
 #include "YMGAQWidgetFactory.h"
 #include <YUIException.h>
+#include <string.h>
 
-YQWE::YQWE() : YExternalWidgets()
+YQWE::YQWE( const std::string& name ) : YExternalWidgets(name)
 {
 }
 
@@ -42,13 +43,11 @@ YExternalWidgetFactory* YQWE::createExternalWidgetFactory()
   return factory;
 }
 
-YExternalWidgets * createExternalWidgets()
+YExternalWidgets * createExternalWidgets(const char *name)
 {
-    if ( ! YExternalWidgets::externalWidgets() )
-    {
-        YQWE * ue = new YQWE( );
-        YUI_CHECK_NEW ( ue );
-    }
+  std::string pluginName(name);
+  YQWE * ew = new YQWE( pluginName );
+  YUI_CHECK_NEW ( ew );
 
-    return YExternalWidgets::externalWidgets();
+  return YExternalWidgets::externalWidgets(pluginName);
 }

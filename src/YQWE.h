@@ -29,7 +29,7 @@
 class YQWE : public YExternalWidgets
 {
 public:
-  YQWE();
+  YQWE( const std::string& name );
   virtual ~YQWE();
 
 protected:
