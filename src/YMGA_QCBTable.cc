@@ -480,7 +480,7 @@ YMGA_QCBTable::slotcolumnClicked(int               button,
     YMGA_QCBTableListViewItem * it = dynamic_cast<YMGA_QCBTableListViewItem*>(item);
     YTableItem *pYTableItem = it->origItem();
 
-    yuiMilestone() << "Column is checked: " << (item->checkState(col)==Qt::CheckState::Unchecked?"yes":"no") <<  std::endl;
+    yuiDebug() << "Column is checked: " << (item->checkState(col)==Qt::CheckState::Unchecked?"yes":"no") <<  std::endl;
 
     // it seems items contains old value when signal is emitted
     pYTableItem->setSelected(item->checkState(col)==Qt::CheckState::Unchecked);
