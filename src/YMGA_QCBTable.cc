@@ -278,18 +278,24 @@ YMGA_QCBTable::selectItem( YItem * yitem, bool selected )
     YUI_CHECK_PTR( clone );
 
 
-    if ( ! selected && clone == _qt_listView->currentItem() )
+  if ( ! selected && clone == _qt_listView->currentItem() )
+  {
+    deselectAllItems();
+  }
+  else
+  {
+    if ( ! hasMultiSelection() )
+      _qt_listView->setCurrentItem ( clone ); // This deselects all other items!
+    if ( hasCheckboxItems() )
     {
-	deselectAllItems();
+      clone->setCheckState ( checkboxItemColumn(), selected ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
     }
     else
     {
-	if ( ! hasMultiSelection() )
-	    _qt_listView->setCurrentItem( clone ); // This deselects all other items!
-
-	clone->setSelected( true );
-	YMGA_CBTable::selectItem( item, selected );
+      clone->setSelected ( true );
+      YMGA_CBTable::selectItem ( item, selected );
     }
+  }
 }
 
 
