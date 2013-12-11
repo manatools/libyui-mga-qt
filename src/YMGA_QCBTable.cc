@@ -42,7 +42,7 @@
 struct YMGA_QCBTable::Private
 {
   ///< offset to first YCell 
-  ///  usually 1 if checkbox Enabled and mode is YTableCheckBoxOnFirstColumn
+  ///  usually 1 if checkbox Enabled and mode is YCBTableCheckBoxOnFirstColumn
   ///  0 otherwise
   unsigned int firstColumnOffset;
 
@@ -52,9 +52,9 @@ struct YMGA_QCBTable::Private
 };
 
 
-YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YTableMode selectionMode )
+YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBTableMode tableMode )
     : QFrame( (QWidget *) parent->widgetRep() )
-    , YMGA_CBTable( parent, tableHeader, selectionMode ), _qt_listView(0), d(new Private)
+    , YMGA_CBTable( parent, tableHeader, tableMode ), _qt_listView(0), d(new Private)
 {
     YUI_CHECK_NEW( d );
 
@@ -76,16 +76,16 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YTab
     d->firstColumnOffset = 0;
     d->checkboxEnabled   = false;
 
-    yuiMilestone() << " Slection mode " << selectionMode <<  std::endl;
+    yuiMilestone() << " Slection mode " << tableMode <<  std::endl;
     
-    if ( selectionMode == YTableMultiSelection )
-      _qt_listView->setSelectionMode ( QAbstractItemView::ExtendedSelection );
-    else if ( selectionMode == YTableCheckBoxOnFirstColumn )
+//     if ( tableMode == YTableMultiSelection )
+//       _qt_listView->setSelectionMode ( QAbstractItemView::ExtendedSelection );
+    if ( tableMode == YCBTableCheckBoxOnFirstColumn )
     {
         d->checkboxEnabled = true;
         d->firstColumnOffset = 1;
     }
-    else if ( selectionMode == YTableCheckBoxOnLastColumn )
+    else if ( tableMode == YCBTableCheckBoxOnLastColumn )
     {
         d->checkboxEnabled = true;
     }
@@ -134,14 +134,6 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YTab
     connect( _qt_listView,      SIGNAL( columnClicked ( int , QTreeWidgetItem* , int , const QPoint &) ),
              this,              SLOT  ( slotcolumnClicked ( int , QTreeWidgetItem* , int, const QPoint &  ) ) );
     
-    if ( selectionMode == YTableMultiSelection )
-    {
-	// This is the exceptional case - avoid performance drop in the normal case
-
-	connect( _qt_listView, 	SIGNAL( itemSelectionChanged() ),
-		 this,		SLOT  ( slotSelectionChanged() ) );
-
-    }
 }
 
 
@@ -370,41 +362,6 @@ YMGA_QCBTable::slotSelected( QTreeWidgetItem * listViewItem  )
 
 
 void
-YMGA_QCBTable::slotSelectionChanged()
-{
-    YSelectionWidget::deselectAllItems();
-    yuiDebug() << std::endl;
-
-    QList<QTreeWidgetItem *> selItems = _qt_listView->selectedItems();
-
-    for ( QList<QTreeWidgetItem *>::iterator it = selItems.begin();
-	  it != selItems.end();
-	  ++it )
-    {
-	YMGA_QCBTableListViewItem * tableListViewItem = dynamic_cast<YMGA_QCBTableListViewItem *> (*it);
-
-	if ( tableListViewItem )
-	{
-	    tableListViewItem->origItem()->setSelected( true );
-
-	    yuiDebug() << "Selected item: " << tableListViewItem->origItem()->label() << std::endl;
-	}
-    }
-
-    if ( immediateMode() )
-    {
-	if ( ! YQUI::ui()->eventPendingFor( this ) )
-	{
-	    // Avoid overwriting a (more important) Activated event with a SelectionChanged event
-
-	    yuiDebug() << "Sending SelectionChanged event" << std::endl;
-	    YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::SelectionChanged ) );
-	}
-    }
-}
-
-
-void
 YMGA_QCBTable::slotActivated( QTreeWidgetItem * listViewItem )
 {
     selectOrigItem( listViewItem );
@@ -544,8 +501,8 @@ YMGA_QCBTableListViewItem::updateCell( const YTableCell * cell )
 	return;
 
     int column = cell->column();
-    YTableMode mode = table()->selectionMode();
-    if (mode == YTableMode::YTableCheckBoxOnFirstColumn)
+    YCBTableMode mode = table()->tableMode();
+    if (mode == YCBTableMode::YCBTableCheckBoxOnFirstColumn)
       column += 1;
 
     //
