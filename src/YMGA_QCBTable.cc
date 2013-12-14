@@ -24,6 +24,7 @@
 
 #include <QHeaderView>
 #include <QVBoxLayout>
+#include <QKeyEvent>
 #include <QString>
 #define YUILogComponent "mga-qt-ui"
 #include <yui/YUILog.h>
@@ -39,16 +40,52 @@
 #include "YMGA_QCBTable.h"
 #include <yui/qt/YQApplication.h>
 
+#include <QKeyEvent>
+
 struct YMGA_QCBTable::Private
 {
   ///< offset to first YCell 
   ///  usually 1 if checkbox Enabled and mode is YCBTableCheckBoxOnFirstColumn
   ///  0 otherwise
   unsigned int firstColumnOffset;
+};
 
-  ///< quick way to know if YTable has checkbox enabled, instead of 
-  ///  multiselection or single selection mode
-  bool         checkboxEnabled;
+class YQ2ListView : public  QY2ListView
+{
+public:
+  /**
+     * Constructor
+     **/
+  YQ2ListView ( QWidget * parent ) : QY2ListView ( parent )
+  {
+    setFocusPolicy ( Qt::StrongFocus );
+  }
+
+  /**
+   * Destructor
+   **/
+  virtual ~YQ2ListView() {}
+
+  void keyPressEvent ( QKeyEvent * event )
+  {
+    int k = event->key();
+    switch ( k )
+    {
+    case Qt::Key_Space:
+      event->accept();
+      emit itemClicked ( currentItem(), -1 );
+      break;
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+      event->accept();
+      emit itemDoubleClicked ( currentItem(), -1 );
+      break;
+    default:
+      QY2ListView::keyPressEvent ( event );
+      break;
+    }
+  }
+
 };
 
 
@@ -56,84 +93,67 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBT
     : QFrame( (QWidget *) parent->widgetRep() )
     , YMGA_CBTable( parent, tableHeader, tableMode ), _qt_listView(0), d(new Private)
 {
-    YUI_CHECK_NEW( d );
+  YUI_CHECK_NEW ( d );
 
-    setWidgetRep( this );
-    QVBoxLayout* layout = new QVBoxLayout( this );
-    layout->setSpacing( 0 );
-    setLayout( layout );
+  setWidgetRep ( this );
+  QVBoxLayout* layout = new QVBoxLayout ( this );
+  layout->setSpacing ( 0 );
+  setLayout ( layout );
 
-    layout->setMargin( YQWidgetMargin );
+  layout->setMargin ( YQWidgetMargin );
 
-    _qt_listView = new QY2ListView( this );
-    YUI_CHECK_NEW( _qt_listView );
-    layout->addWidget( _qt_listView );
-    _qt_listView->setAllColumnsShowFocus( true );
-    _qt_listView->header()->setStretchLastSection( false );
+  _qt_listView = new YQ2ListView ( this );
+  YUI_CHECK_NEW ( _qt_listView );
+  layout->addWidget ( _qt_listView );
+  _qt_listView->setAllColumnsShowFocus ( true );
+  _qt_listView->header()->setStretchLastSection ( false );
 
-    setKeepSorting(  keepSorting() );
+  setKeepSorting ( keepSorting() );
 
-    d->firstColumnOffset = 0;
-    d->checkboxEnabled   = false;
+  d->firstColumnOffset = 0;
 
-    yuiMilestone() << " Slection mode " << tableMode <<  std::endl;
-    
-//     if ( tableMode == YTableMultiSelection )
-//       _qt_listView->setSelectionMode ( QAbstractItemView::ExtendedSelection );
-    if ( tableMode == YCBTableCheckBoxOnFirstColumn )
-    {
-        d->checkboxEnabled = true;
-        d->firstColumnOffset = 1;
-    }
-    else if ( tableMode == YCBTableCheckBoxOnLastColumn )
-    {
-        d->checkboxEnabled = true;
-    }
-    
-    _qt_listView->setContextMenuPolicy( Qt::CustomContextMenu );
+  yuiMilestone() << " Slection mode " << tableMode <<  std::endl;
 
-    //
-    // Add columns
-    //
+  if ( tableMode == YCBTableCheckBoxOnFirstColumn )
+  {
+    d->firstColumnOffset = 1;
+  }
 
-    QStringList headers;
-    _qt_listView->setColumnCount( columns() + (d->checkboxEnabled ? 1 : 0) );
+  _qt_listView->setContextMenuPolicy ( Qt::CustomContextMenu );
 
-    //TODO anaselli remove next line if not needed any more
-//     _qt_listView->setSelectionBehavior(QAbstractItemView::SelectItems);
-    if ( d->firstColumnOffset == 1 )
-    {
-      headers << "";
-    }
-    for ( int i=0; i < columns(); i++ )
-    {
-        headers << fromUTF8( header(i) );
-    }
-    if (d->checkboxEnabled && d->firstColumnOffset == 0)
-    {
-      headers << "";
-    }
+  //
+  // Add columns
+  //
 
-    _qt_listView->setHeaderLabels( headers );
-    _qt_listView->header()->setResizeMode( QHeaderView::Interactive );
-    _qt_listView->sortItems( 0, Qt::AscendingOrder);
+  QStringList headers;
+  _qt_listView->setColumnCount ( columns() );
 
-    //
-    // Connect signals and slots
-    //
+  // YCBTable needs header also for the checkable column
+  for ( int i=0; i < columns(); i++ )
+  {
+    headers << fromUTF8 ( header ( i ) );
+  }
 
-    connect( _qt_listView,      SIGNAL( itemDoubleClicked ( QTreeWidgetItem *, int ) ),
-	     this, 		SLOT  ( slotActivated	  ( QTreeWidgetItem * ) ) );
+  _qt_listView->setHeaderLabels ( headers );
+  _qt_listView->header()->setResizeMode ( QHeaderView::Interactive );
+  _qt_listView->sortItems ( 0, Qt::AscendingOrder );
 
-    connect( _qt_listView, 	SIGNAL( currentItemChanged ( QTreeWidgetItem *, QTreeWidgetItem * ) ),
-	     this, 		SLOT  ( slotSelected	   ( QTreeWidgetItem * ) ) );
+  //
+  // Connect signals and slots
+  //
 
-    connect( _qt_listView,      SIGNAL( customContextMenuRequested ( const QPoint & ) ),
-             this,      	SLOT  ( slotContextMenu ( const QPoint & ) ) );
-    
-    connect( _qt_listView,      SIGNAL( columnClicked ( int , QTreeWidgetItem* , int , const QPoint &) ),
-             this,              SLOT  ( slotcolumnClicked ( int , QTreeWidgetItem* , int, const QPoint &  ) ) );
-    
+  connect ( _qt_listView,      SIGNAL ( itemDoubleClicked ( QTreeWidgetItem *, int ) ),
+            this, 		SLOT ( slotActivated ( QTreeWidgetItem *, int ) ) );
+
+  connect ( _qt_listView,      SIGNAL ( itemClicked ( QTreeWidgetItem *, int ) ),
+            this,               SLOT ( slotcolumnClicked ( QTreeWidgetItem *, int ) ) );
+
+  connect ( _qt_listView, 	SIGNAL ( currentItemChanged ( QTreeWidgetItem *, QTreeWidgetItem * ) ),
+            this, 		SLOT ( slotSelected ( QTreeWidgetItem * ) ) );
+
+  connect ( _qt_listView,      SIGNAL ( customContextMenuRequested ( const QPoint & ) ),
+            this,      	SLOT ( slotContextMenu ( const QPoint & ) ) );
+
 }
 
 
@@ -143,23 +163,10 @@ YMGA_QCBTable::~YMGA_QCBTable()
       delete d;
 }
 
-bool YMGA_QCBTable::hasCheckboxItems()
-{
-  return d->checkboxEnabled;
-}
-
 int YMGA_QCBTable::checkboxItemColumn()
 {
-  int column = -1;
-  
-  if (d->checkboxEnabled)
-  {
-    if (d->firstColumnOffset == 1)
-      column = 0;
-    else
-      column = columns();
-  }
-  
+  int column = (d->firstColumnOffset == 1) ? 0 : columns() -1;
+
   return column;
 }
 
@@ -168,107 +175,112 @@ int YMGA_QCBTable::checkboxItemColumn()
 void
 YMGA_QCBTable::setKeepSorting( bool keepSorting )
 {
-    YMGA_CBTable::setKeepSorting( keepSorting );
-    _qt_listView->setSortByInsertionSequence( keepSorting );
-    _qt_listView->setSortingEnabled( ! keepSorting );
+  YMGA_CBTable::setKeepSorting( keepSorting );
+  _qt_listView->setSortByInsertionSequence( keepSorting );
+  _qt_listView->setSortingEnabled( ! keepSorting );
 }
 
 
 void
 YMGA_QCBTable::addItem( YItem * yitem )
 {
-    addItem( yitem,
-	     false, // batchMode
-	     true); // resizeColumnsToContent
+  addItem ( yitem,
+            false, // batchMode
+            true ); // resizeColumnsToContent
 }
 
 
 void
 YMGA_QCBTable::addItem( YItem * yitem, bool batchMode, bool resizeColumnsToContent )
 {
-    YTableItem * item = dynamic_cast<YTableItem *> (yitem);
-    YUI_CHECK_PTR( item );
+  YCBTableItem * item = dynamic_cast<YCBTableItem *> ( yitem );
+  YUI_CHECK_PTR ( item );
 
-    YMGA_CBTable::addItem( item );
+  YMGA_CBTable::addItem ( item );
 
-    YMGA_QCBTableListViewItem * clone = new YMGA_QCBTableListViewItem( this, _qt_listView, item );
-    YUI_CHECK_NEW( clone );
+  YMGA_QCBTableListViewItem * clone = new YMGA_QCBTableListViewItem ( this, _qt_listView, item );
+  YUI_CHECK_NEW ( clone );
 
-    if ( ! batchMode && item->selected() )
+  if ( ! batchMode && item->selected() )
+  {
+    // YTable enforces single selection, if appropriate
+
+    YQSignalBlocker sigBlocker ( _qt_listView );
+    YMGA_QCBTable::selectItem ( YSelectionWidget::selectedItem(), true );
+  }
+
+
+  //
+  // Set column alignment
+  //
+
+  for ( int col=0; col < columns(); col++ )
+  {
+    switch ( alignment ( col ) )
     {
-	// YTable enforces single selection, if appropriate
+    case YAlignBegin:
+      clone->setTextAlignment ( col, Qt::AlignLeft   | Qt::AlignVCenter );
+      break;
+    case YAlignCenter:
+      clone->setTextAlignment ( col, Qt::AlignCenter | Qt::AlignVCenter );
+      break;
+    case YAlignEnd:
+      clone->setTextAlignment ( col, Qt::AlignRight  | Qt::AlignVCenter );
+      break;
 
-	YQSignalBlocker sigBlocker( _qt_listView );
-	YMGA_QCBTable::selectItem( YSelectionWidget::selectedItem(), true );
+    case YAlignUnchanged:
+      break;
     }
+  }
 
+  if ( ! batchMode )
+    _qt_listView->sortItems ( 0, Qt::AscendingOrder );
 
-    //
-    // Set column alignment
-    //
-
-    for ( int col=0; col < columns(); col++ )
-    {
-	switch ( alignment( col ) )
-	{
-	    case YAlignBegin:	clone->setTextAlignment( col, Qt::AlignLeft   | Qt::AlignVCenter );	break;
-	    case YAlignCenter:	clone->setTextAlignment( col, Qt::AlignCenter | Qt::AlignVCenter );	break;
-	    case YAlignEnd:	clone->setTextAlignment( col, Qt::AlignRight  | Qt::AlignVCenter );	break;
-
-	    case YAlignUnchanged: break;
-	}
-    }
-
-    if ( ! batchMode )
-	_qt_listView->sortItems( 0, Qt::AscendingOrder);
-
-    if ( resizeColumnsToContent )
-    {
-        for ( int i=0; i < columns(); i++ )
-	    _qt_listView->resizeColumnToContents( i );
-	/* NOTE: resizeColumnToContents(...) is performance-critical ! */
-    }
+  if ( resizeColumnsToContent )
+  {
+    for ( int i=0; i < columns(); i++ )
+      _qt_listView->resizeColumnToContents ( i );
+    /* NOTE: resizeColumnToContents(...) is performance-critical ! */
+  }
 }
 
 
 void
 YMGA_QCBTable::addItems( const YItemCollection & itemCollection )
 {
-    YQSignalBlocker sigBlocker( _qt_listView );
+  YQSignalBlocker sigBlocker ( _qt_listView );
 
-    for ( YItemConstIterator it = itemCollection.begin();
-	  it != itemCollection.end();
-	  ++it )
-    {
-	addItem( *it,
-		 true,    // batchMode
-		 false ); // resizeColumnsToContent
-	/* NOTE: resizeToContents=true would cause a massive performance drop !
-	         => resize columns to content only one time at the end of this
-	            function                                                 */
-    }
+  for ( YItemConstIterator it = itemCollection.begin();
+        it != itemCollection.end();
+        ++it )
+  {
+    addItem ( *it,
+              true,    // batchMode
+              false ); // resizeColumnsToContent
+    /* NOTE: resizeToContents=true would cause a massive performance drop !
+             => resize columns to content only one time at the end of this
+                function                                                 */
+  }
 
-    YItem * sel = YSelectionWidget::selectedItem();
+  YItem * sel = YSelectionWidget::selectedItem();
 
-    if ( sel )
-	YMGA_QCBTable::selectItem( sel, true );
+  if ( sel )
+    YMGA_QCBTable::selectItem ( sel, true );
 
-    for ( int i=0; i < columns(); i++ )
-	_qt_listView->resizeColumnToContents( i );
+  for ( int i=0; i < columns(); i++ )
+    _qt_listView->resizeColumnToContents ( i );
 }
 
 
-void
-YMGA_QCBTable::selectItem( YItem * yitem, bool selected )
+void YMGA_QCBTable::selectItem ( YItem * yitem, bool selected )
 {
-    YQSignalBlocker sigBlocker( _qt_listView );
+  YQSignalBlocker sigBlocker ( _qt_listView );
 
-    YTableItem * item = dynamic_cast<YTableItem *> (yitem);
-    YUI_CHECK_PTR( item );
+  YCBTableItem * item = dynamic_cast<YCBTableItem *> ( yitem );
+  YUI_CHECK_PTR ( item );
 
-    YMGA_QCBTableListViewItem * clone = (YMGA_QCBTableListViewItem *) item->data();
-    YUI_CHECK_PTR( clone );
-
+  YMGA_QCBTableListViewItem * clone = ( YMGA_QCBTableListViewItem * ) item->data();
+  YUI_CHECK_PTR ( clone );
 
   if ( ! selected && clone == _qt_listView->currentItem() )
   {
@@ -278,16 +290,24 @@ YMGA_QCBTable::selectItem( YItem * yitem, bool selected )
   {
     if ( ! hasMultiSelection() )
       _qt_listView->setCurrentItem ( clone ); // This deselects all other items!
-    if ( hasCheckboxItems() )
-    {
-      clone->setCheckState ( checkboxItemColumn(), selected ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
-    }
-    else
-    {
-      clone->setSelected ( true );
-      YMGA_CBTable::selectItem ( item, selected );
-    }
+
+    clone->setSelected ( true );
+    YMGA_CBTable::selectItem ( item, selected );
   }
+}
+
+void YMGA_QCBTable::checkItem ( YItem* yitem, bool checked )
+{
+  YQSignalBlocker sigBlocker ( _qt_listView );
+
+  YCBTableItem * item = dynamic_cast<YCBTableItem *> ( yitem );
+  YUI_CHECK_PTR ( item );
+
+  YMGA_QCBTableListViewItem * clone = ( YMGA_QCBTableListViewItem * ) item->data();
+  YUI_CHECK_PTR ( clone );
+
+  item->cell(checked);
+  clone->setCheckState ( checkboxItemColumn(), checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 }
 
 
@@ -312,7 +332,7 @@ YMGA_QCBTable::deleteAllItems()
 void
 YMGA_QCBTable::cellChanged( const YTableCell * cell )
 {
-    YTableItem * item = cell->parent();
+    YCBTableItem * item = dynamic_cast<YCBTableItem*>(cell->parent());
     YUI_CHECK_PTR( item );
 
     YMGA_QCBTableListViewItem * clone = (YMGA_QCBTableListViewItem *) item->data();
@@ -322,55 +342,78 @@ YMGA_QCBTable::cellChanged( const YTableCell * cell )
 }
 
 
-void
-YMGA_QCBTable::selectOrigItem( QTreeWidgetItem * listViewItem )
+void YMGA_QCBTable::selectOrigItem( QTreeWidgetItem * listViewItem )
 {
-    if ( listViewItem )
-    {
-	YMGA_QCBTableListViewItem * tableListViewItem = dynamic_cast<YMGA_QCBTableListViewItem *> (listViewItem);
-	YUI_CHECK_PTR( tableListViewItem );
+  if ( listViewItem )
+  {
+    YMGA_QCBTableListViewItem * tableListViewItem = dynamic_cast<YMGA_QCBTableListViewItem *> ( listViewItem );
+    YUI_CHECK_PTR ( tableListViewItem );
 
-	YMGA_CBTable::selectItem( tableListViewItem->origItem(), true );
+    YMGA_CBTable::selectItem ( tableListViewItem->origItem(), true );
+     if ( ! hasMultiSelection() )
+            _qt_listView->setCurrentItem( listViewItem );
+  }
+}
+
+
+void YMGA_QCBTable::slotSelected ( QTreeWidgetItem * listViewItem )
+{
+  if ( listViewItem && _qt_listView->selectedItems().count() > 0 )
+    selectOrigItem ( listViewItem );
+  else
+  {
+    // Qt might select nothing if a user clicks outside the items in the widget
+
+    if ( hasItems() && YSelectionWidget::hasSelectedItem() )
+      YMGA_QCBTable::selectItem ( YSelectionWidget::selectedItem(), true );
+  }
+
+  if ( immediateMode() )
+  {
+    if ( ! YQUI::ui()->eventPendingFor ( this ) )
+    {
+      // Avoid overwriting a (more important) Activated event with a SelectionChanged event
+
+      yuiDebug() << "Sending SelectionChanged event" << std::endl;
+      YQUI::ui()->sendEvent ( new YWidgetEvent ( this, YEvent::SelectionChanged ) );
     }
+  }
+}
+
+void YMGA_QCBTable::slotActivated( QTreeWidgetItem * listViewItem, int column )
+{
+  selectOrigItem( listViewItem );
+  if ( notify() )
+  {
+    yuiDebug() << "Sending Activated event" << std::endl;
+    YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::Activated ) );
+  }
 }
 
 
 void
-YMGA_QCBTable::slotSelected( QTreeWidgetItem * listViewItem  )
+YMGA_QCBTable::slotcolumnClicked(QTreeWidgetItem* item,
+                                 int              col)
 {
-    if ( listViewItem && _qt_listView->selectedItems().count() > 0 )
-	selectOrigItem( listViewItem );
-    else
-    {
-	// Qt might select nothing if a user clicks outside the items in the widget
+  selectOrigItem( item );
 
-	if ( hasItems() && YSelectionWidget::hasSelectedItem() )
-	    YMGA_QCBTable::selectItem( YSelectionWidget::selectedItem(), true );
-    }
+  if ( col == checkboxItemColumn() )
+  {
+    YMGA_QCBTableListViewItem * it = dynamic_cast<YMGA_QCBTableListViewItem*> ( item );
+    Qt::CheckState checked = item->checkState ( col );
+    YCBTableItem *pYCBTableItem = it->origItem();
 
-    if ( immediateMode() )
-    {
-	if ( ! YQUI::ui()->eventPendingFor( this ) )
-	{
-	    // Avoid overwriting a (more important) Activated event with a SelectionChanged event
+    yuiDebug() << "Column is checked: " << (checked  == Qt::CheckState::Checked?"yes":"no" ) <<  std::endl;
 
-	    yuiDebug() << "Sending SelectionChanged event" << std::endl;
-	    YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::SelectionChanged ) );
-	}
-    }
-}
-
-
-void
-YMGA_QCBTable::slotActivated( QTreeWidgetItem * listViewItem )
-{
-    selectOrigItem( listViewItem );
+    // it seems items contains old value when signal is emitted
+    pYCBTableItem->check ( checked == Qt::CheckState::Checked );
 
     if ( notify() )
     {
-	yuiDebug() << "Sending Activated event" << std::endl;
-	YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::Activated ) );
+      YMGA_CBTable::setChangedItem ( pYCBTableItem );
+      YQUI::ui()->sendEvent ( new YWidgetEvent ( this, YEvent::ValueChanged ) );
     }
+  }
 }
 
 
@@ -432,32 +475,9 @@ YMGA_QCBTable::slotContextMenu ( const QPoint & pos )
 }
 
 
-void
-YMGA_QCBTable::slotcolumnClicked(int               button,
-                           QTreeWidgetItem * item,
-                           int               col,
-                           const QPoint &    pos)
-{
-  if (d->checkboxEnabled && col == checkboxItemColumn())
-  {
-    YMGA_QCBTableListViewItem * it = dynamic_cast<YMGA_QCBTableListViewItem*>(item);
-    YTableItem *pYTableItem = it->origItem();
-
-    yuiDebug() << "Column is checked: " << (item->checkState(col)==Qt::CheckState::Unchecked?"yes":"no") <<  std::endl;
-
-    // it seems items contains old value when signal is emitted
-    pYTableItem->setSelected(item->checkState(col)==Qt::CheckState::Unchecked);
-     if ( notify() )
-     {
-       YMGA_CBTable::setChangedItem(pYTableItem);
-       YQUI::ui()->sendEvent(new YWidgetEvent(this, YEvent::ValueChanged));
-     }
-  } 
-}
-
 YMGA_QCBTableListViewItem::YMGA_QCBTableListViewItem( YMGA_QCBTable *	table,
 					  QY2ListView * parent,
-					  YTableItem *	origItem )
+					  YCBTableItem *	origItem )
     : QY2ListViewItem( parent )
     , _table( table )
     , _origItem( origItem )
@@ -467,15 +487,10 @@ YMGA_QCBTableListViewItem::YMGA_QCBTableListViewItem( YMGA_QCBTable *	table,
 
     _origItem->setData( this );
         
-    yuiMilestone() << "item checkable? " << (table->hasCheckboxItems()?"yes":"no") 
-                   << " checkable column is " << table->checkboxItemColumn() <<  std::endl;
+    yuiDebug() << "Checkable column is " << table->checkboxItemColumn() <<  std::endl;
 
-    int table_columns = _table->columns();
-    if (table->hasCheckboxItems())
-    {
-      table_columns -= 1;
-      setCheckState(table->checkboxItemColumn(), _origItem->selected() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);      
-    }
+    int table_columns = _table->columns()-2;
+    setCheckState(table->checkboxItemColumn(), _origItem->checked() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);      
     
     for ( YTableCellIterator it = _origItem->cellsBegin();
 	  it != _origItem->cellsEnd();

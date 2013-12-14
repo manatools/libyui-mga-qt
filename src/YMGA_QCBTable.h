@@ -30,9 +30,10 @@
 #include <yui/qt/QY2ListView.h>
 
 
-class QY2ListView;
+// class QY2ListView;
 class QTreeWidgetItem;
 class YQListViewItem;
+
 
 class YMGA_QCBTable : public QFrame, public YMGA_CBTable
 {
@@ -105,6 +106,14 @@ public:
     virtual void cellChanged( const YTableCell * cell );
 
     /**
+     * check/uncheck Item from application.
+     * 
+     * Note that item->check(true) does not update the table
+     * 
+     **/
+    void checkItem( YItem * item, bool checked = true );
+    
+    /**
      * Set enabled/disabled state.
      *
      * Reimplemented from YWidget.
@@ -140,10 +149,6 @@ public:
     virtual bool setKeyboardFocus();
 
     /**
-     * says if a checkbox column is enabled
-     */
-    bool hasCheckboxItems();
-    /**
      * returns which column is managed by checkboxes, if any
      * -1 otherwise
      */
@@ -159,7 +164,7 @@ protected slots:
     /**
      * Notification that an item is activated (double click or keyboard).
      **/
-    void slotActivated( QTreeWidgetItem * );
+    void slotActivated( QTreeWidgetItem* listViewItem, int column );
 
     /**
      * Propagate a context menu selection
@@ -169,15 +174,13 @@ protected slots:
     void slotContextMenu ( const QPoint & pos );
 
 
-    void slotcolumnClicked(int                   button,
-                           QTreeWidgetItem *     item,
-                           int                   col,
-                           const QPoint &        pos );
-    
+    void slotcolumnClicked(QTreeWidgetItem *     item,
+                           int                   col);
+
 protected:
 
     /**
-     * Select the original item (the YTableItem) that corresponds to the
+     * Select the original item (the YCBTableItem) that corresponds to the
      * specified listViewItem.
      **/
     void selectOrigItem( QTreeWidgetItem * listViewItem );
@@ -193,6 +196,8 @@ protected:
     //
 
     QY2ListView * _qt_listView;
+    
+//     void keyPressEvent ( QKeyEvent * event );
 
 private:
     struct Private;
@@ -202,7 +207,7 @@ private:
 
 
 /**
- * Visual representation of a YTableItem.
+ * Visual representation of a YCBTableItem.
  **/
 class YMGA_QCBTableListViewItem: public QY2ListViewItem
 {
@@ -213,7 +218,7 @@ public:
      **/
     YMGA_QCBTableListViewItem( YMGA_QCBTable     * 	table,
 			 QY2ListView * 	parent,
-			 YTableItem  *	origItem );
+			 YCBTableItem  *	origItem );
 
     /**
      * Return the parent table widget.
@@ -221,9 +226,9 @@ public:
     YMGA_QCBTable * table() const { return _table; }
 
     /**
-     * Return the corresponding YTableItem.
+     * Return the corresponding YCBTableItem.
      **/
-    YTableItem * origItem() const { return _origItem; }
+    YCBTableItem * origItem() const { return _origItem; }
 
     /**
      * Update this item's display with the content of 'cell'.
@@ -233,7 +238,7 @@ public:
 protected:
 
     YMGA_QCBTable *	 _table;
-    YTableItem * _origItem;
+    YCBTableItem * _origItem;
 };
 
 
