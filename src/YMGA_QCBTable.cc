@@ -306,7 +306,7 @@ void YMGA_QCBTable::checkItem ( YItem* yitem, bool checked )
   YMGA_QCBTableListViewItem * clone = ( YMGA_QCBTableListViewItem * ) item->data();
   YUI_CHECK_PTR ( clone );
 
-  item->cell(checked);
+  item->check(checked);
   clone->setCheckState ( checkboxItemColumn(), checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 }
 
