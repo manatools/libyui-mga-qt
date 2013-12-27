@@ -358,7 +358,7 @@ void YMGA_QCBTable::selectOrigItem( QTreeWidgetItem * listViewItem )
 
 void YMGA_QCBTable::slotSelected ( QTreeWidgetItem * listViewItem )
 {
-  if ( listViewItem && _qt_listView->selectedItems().count() > 0 )
+  if ( listViewItem )
     selectOrigItem ( listViewItem );
   else
   {
