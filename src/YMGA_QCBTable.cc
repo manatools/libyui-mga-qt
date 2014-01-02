@@ -443,7 +443,7 @@ YMGA_QCBTable::preferredHeight()
     // Arbitrary value.
     // Use a MinSize widget to set a size that is useful for the application.
 
-    return 30;
+    return 100;
 }
 
 
