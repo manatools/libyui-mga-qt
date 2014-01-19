@@ -22,7 +22,7 @@
 
 /-*/
 
-#include <QColorGroup>
+#include <QPoint>
 #define YUILogComponent "mga-qt"
 #include <yui/YUILog.h>
 

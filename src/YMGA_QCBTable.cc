@@ -24,7 +24,6 @@
 
 #include <QHeaderView>
 #include <QVBoxLayout>
-#include <QKeyEvent>
 #include <QString>
 #define YUILogComponent "mga-qt-ui"
 #include <yui/YUILog.h>
@@ -36,11 +35,9 @@
 #include <yui/qt/YQSignalBlocker.h>
 #include <yui/YUIException.h>
 
-#include <yui/qt/QY2ListView.h>
 #include "YMGA_QCBTable.h"
 #include <yui/qt/YQApplication.h>
 
-#include <QKeyEvent>
 
 struct YMGA_QCBTable::Private
 {
@@ -48,44 +45,6 @@ struct YMGA_QCBTable::Private
   ///  usually 1 if checkbox Enabled and mode is YCBTableCheckBoxOnFirstColumn
   ///  0 otherwise
   unsigned int firstColumnOffset;
-};
-
-class YQ2ListView : public  QY2ListView
-{
-public:
-  /**
-     * Constructor
-     **/
-  YQ2ListView ( QWidget * parent ) : QY2ListView ( parent )
-  {
-    setFocusPolicy ( Qt::StrongFocus );
-  }
-
-  /**
-   * Destructor
-   **/
-  virtual ~YQ2ListView() {}
-
-  void keyPressEvent ( QKeyEvent * event )
-  {
-    int k = event->key();
-    switch ( k )
-    {
-    case Qt::Key_Space:
-      event->accept();
-      emit itemClicked ( currentItem(), -1 );
-      break;
-    case Qt::Key_Enter:
-    case Qt::Key_Return:
-      event->accept();
-      emit itemDoubleClicked ( currentItem(), -1 );
-      break;
-    default:
-      QY2ListView::keyPressEvent ( event );
-      break;
-    }
-  }
-
 };
 
 
@@ -102,7 +61,7 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBT
 
   layout->setMargin ( YQWidgetMargin );
 
-  _qt_listView = new YQ2ListView ( this );
+  _qt_listView = new QY2ListView ( this );
   YUI_CHECK_NEW ( _qt_listView );
   layout->addWidget ( _qt_listView );
   _qt_listView->setAllColumnsShowFocus ( true );
@@ -135,7 +94,7 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBT
   }
 
   _qt_listView->setHeaderLabels ( headers );
-  _qt_listView->header()->setResizeMode ( QHeaderView::Interactive );
+  _qt_listView->header()->setSectionResizeMode ( QHeaderView::Interactive );
   _qt_listView->sortItems ( 0, Qt::AscendingOrder );
 
   //
@@ -159,7 +118,6 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBT
 
 YMGA_QCBTable::~YMGA_QCBTable()
 {
-    if (d)
       delete d;
 }
 
