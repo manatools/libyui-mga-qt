@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct 19 23:51:42 CEST 2015 - anaselli@linux.it
+- new libyui major so version
+- 1.0.3
+
+-------------------------------------------------------------------
 Sun Jan 19 13:14:40 CET 2014 anaselli@linux.it
 
 - Ported to Qt5 (aligned to yui-qt)
