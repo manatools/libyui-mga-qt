@@ -107,6 +107,10 @@ YMGA_QCBTable::YMGA_QCBTable( YWidget * parent, YTableHeader * tableHeader, YCBT
   connect ( _qt_listView,      SIGNAL ( itemClicked ( QTreeWidgetItem *, int ) ),
             this,               SLOT ( slotcolumnClicked ( QTreeWidgetItem *, int ) ) );
 
+  connect ( _qt_listView,      SIGNAL ( itemChanged ( QTreeWidgetItem *, int ) ),
+            this,               SLOT ( slotcolumnClicked ( QTreeWidgetItem *, int ) ) );
+
+
   connect ( _qt_listView, 	SIGNAL ( currentItemChanged ( QTreeWidgetItem *, QTreeWidgetItem * ) ),
             this, 		SLOT ( slotSelected ( QTreeWidgetItem * ) ) );
 

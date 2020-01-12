@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sun Jan 12 15:09:45 CET 2020 - anaselli@linux.it
+- fix issue 1 Using spacebar to uncheck packages does not mark them for deletion
+- 1.0.6
+
+-------------------------------------------------------------------
 Sun Dec 16 21:21:42 CET 2018 - anaselli@linux.it
 - fix build against qt-5.11.0
 - 1.0.5
