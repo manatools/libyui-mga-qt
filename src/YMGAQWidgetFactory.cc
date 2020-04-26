@@ -36,6 +36,7 @@
 #include <string>
 
 #include "YMGA_QCBTable.h"
+#include "YMGAQMenuBar.h"
 
 using std::string;
 
@@ -61,4 +62,13 @@ YMGAQWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header, YCBT
 
     return table;
 }
+
+YMGAMenuBar * YMGAQWidgetFactory::createMenuBar(YWidget* parent)
+{
+    YMGAQMenuBar *menubar = new YMGAQMenuBar( parent );
+    YUI_CHECK_NEW( menubar );
+
+    return menubar;
+}
+
 

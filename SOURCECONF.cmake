@@ -2,7 +2,8 @@ SET( ${TARGETLIB}_WRAP_UI
 )
 
 SET( ${TARGETLIB}_SOURCES
-	YQWE.cc
+	YQWE.cc	
+	YMGAQMenuBar.cc
 	YMGA_QCBTable.cc
 	YMGAQWidgetFactory.cc
 )
@@ -10,6 +11,7 @@ SET( ${TARGETLIB}_SOURCES
 SET( ${TARGETLIB}_HEADERS
   ##### Here go the headers
 	YQWE.h
+	YMGAQMenuBar.h
 	YMGA_QCBTable.h
 	YMGAQWidgetFactory.h
 )
