@@ -151,19 +151,9 @@ void YMGAQMenuBar::addItem(YItem* yitem)
         addAction(menu, m_item);
       }
     }
-
-#if 0
-    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
-    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an existing file"));
-    connect(openAct, &QAction::triggered, this, &MainWindow::open);
-    fileMenu->addAction(openAct);
-    fileToolBar->addAction(openAct);
-#endif
-
   }
-  // TODO actions (sub menu) and management
+
+  YMGAMenuBar::addItem(yitem);
 }
 
 
@@ -175,7 +165,7 @@ int YMGAQMenuBar::preferredWidth()
     // Arbitrary value.
     // Use a MinSize widget to set a size that is useful for the application.
 
-    return 6 + d->menubar->sizeHint().width();
+    return 20 + d->menubar->sizeHint().width();
 }
 
 
@@ -183,7 +173,7 @@ int YMGAQMenuBar::preferredHeight()
 {
     // Arbitrary value.
     // Use a MinSize widget to set a size that is useful for the application.
-    return 6 + d->menubar->sizeHint().height();
+    return 20 + d->menubar->sizeHint().height();
 }
 
 

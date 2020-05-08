@@ -65,7 +65,7 @@ YMGAQWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header, YCBT
 
 YMGAMenuBar * YMGAQWidgetFactory::createMenuBar(YWidget* parent)
 {
-    YMGAQMenuBar *menubar = new YMGAQMenuBar( parent );
+    YMGAMenuBar *menubar = new YMGAQMenuBar( parent );
     YUI_CHECK_NEW( menubar );
 
     return menubar;
