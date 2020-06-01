@@ -76,6 +76,14 @@ public:
      **/
     virtual void setSize( int newWidth, int newHeight );
 
+    /**
+    * Enable YMGAMenuItem (menu name or menu entry) to enable/disable it into menubar or menu
+    *
+    * Reimplemented from YMGAMenuBar.
+    **/
+    virtual void enableItem(YItem * menu_item, bool enable=true);
+
+
 protected:
 
     /**

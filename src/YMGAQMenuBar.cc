@@ -40,10 +40,15 @@
 
 #include "YMGAQMenuBar.h"
 #include <yui/qt/YQApplication.h>
+#include <yui/mga/YMGAMenuItem.h>
+
+typedef std::map<YItem*, QObject*> MenuEntryMap;
+typedef std::pair<YItem*, QObject*> MenuEntryPair;
 
 struct YMGAQMenuBar::Private
 {
   QMenuBar *menubar;
+  MenuEntryMap menu_entry;
 };
 
 
@@ -103,6 +108,13 @@ void YMGAQMenuBar::addAction(QMenu* menu, YItem* yitem)
   connect(action, &QAction::triggered, action, &QItemAction::selectedItem);
   menu->addAction(action);
 
+  YMGAMenuItem *menuItem = dynamic_cast<YMGAMenuItem *>(yitem);
+  if (menuItem)
+  {
+    action->setEnabled(menuItem->enabled());
+    d->menu_entry.insert(MenuEntryPair(yitem, action));
+  }
+
 }
 
 void YMGAQMenuBar::addSubMenu(QMenu* menu, YItem* yitem)
@@ -114,6 +126,12 @@ void YMGAQMenuBar::addSubMenu(QMenu* menu, YItem* yitem)
   QMenu *m=menu->addMenu(item->label().c_str());
   if (item->hasChildren())
   {
+    YMGAMenuItem *menuItem = dynamic_cast<YMGAMenuItem *>(yitem);
+    if (menuItem)
+    {
+      m->setEnabled(menuItem->enabled());
+      d->menu_entry.insert(MenuEntryPair(yitem, m));
+    }
     for (YItemIterator miter = item->childrenBegin(); miter != item->childrenEnd(); miter++)
     {
       YMenuItem *m_item= dynamic_cast<YMenuItem *>(*miter);
@@ -137,6 +155,7 @@ void YMGAQMenuBar::addItem(YItem* yitem)
 
   // TODO icon from item
   QMenu *menu = d->menubar->addMenu(item->label().c_str());
+
   if (item->hasChildren())
   {
     for (YItemIterator miter = item->childrenBegin(); miter != item->childrenEnd(); miter++)
@@ -153,12 +172,15 @@ void YMGAQMenuBar::addItem(YItem* yitem)
     }
   }
 
+  YMGAMenuItem *menuItem = dynamic_cast<YMGAMenuItem *>(yitem);
+  if (menuItem)
+  {
+    menu->setEnabled(menuItem->enabled());
+    d->menu_entry.insert(MenuEntryPair(yitem, menu));
+  }
   YMGAMenuBar::addItem(yitem);
+  menu->update();
 }
-
-
-
-
 
 int YMGAQMenuBar::preferredWidth()
 {
@@ -180,5 +202,28 @@ int YMGAQMenuBar::preferredHeight()
 void YMGAQMenuBar::setSize( int newWidth, int newHeight )
 {
     resize( newWidth, newHeight );
+}
+
+void YMGAQMenuBar::enableItem(YItem* menu_item, bool enable)
+{
+  YMGAMenuBar::enableItem(menu_item, enable);
+
+  auto search = d->menu_entry.find( menu_item );
+  if (search != d->menu_entry.end())
+  {
+    QMenu * menu_entry = dynamic_cast<QMenu*>(search->second);
+    if (menu_entry)
+      menu_entry->setEnabled(enable);
+    else
+    {
+      QAction * menu_action = dynamic_cast<QAction*>(search->second);
+      if (menu_action)
+        menu_action->setEnabled(enable);
+    }
+  }
+  else
+  {
+    yuiError() << menu_item->label() << " not found" << std::endl;
+  }
 }
 
