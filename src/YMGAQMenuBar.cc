@@ -113,6 +113,7 @@ void YMGAQMenuBar::addAction(QMenu* menu, YItem* yitem)
   {
     action->setEnabled(menuItem->enabled());
     d->menu_entry.insert(MenuEntryPair(yitem, action));
+    action->setVisible(!menuItem->hidden());
   }
 
 }
@@ -131,6 +132,7 @@ void YMGAQMenuBar::addSubMenu(QMenu* menu, YItem* yitem)
     {
       m->setEnabled(menuItem->enabled());
       d->menu_entry.insert(MenuEntryPair(yitem, m));
+      m->menuAction()->setVisible(!menuItem->hidden());
     }
     for (YItemIterator miter = item->childrenBegin(); miter != item->childrenEnd(); miter++)
     {
@@ -177,6 +179,7 @@ void YMGAQMenuBar::addItem(YItem* yitem)
   {
     menu->setEnabled(menuItem->enabled());
     d->menu_entry.insert(MenuEntryPair(yitem, menu));
+    menu->menuAction()->setVisible(!menuItem->hidden());
   }
   YMGAMenuBar::addItem(yitem);
   menu->update();
@@ -199,6 +202,7 @@ int YMGAQMenuBar::preferredHeight()
 }
 
 
+
 void YMGAQMenuBar::setSize( int newWidth, int newHeight )
 {
     resize( newWidth, newHeight );
@@ -219,6 +223,35 @@ void YMGAQMenuBar::enableItem(YItem* menu_item, bool enable)
       QAction * menu_action = dynamic_cast<QAction*>(search->second);
       if (menu_action)
         menu_action->setEnabled(enable);
+    }
+  }
+  else
+  {
+    yuiError() << menu_item->label() << " not found" << std::endl;
+  }
+}
+
+void YMGAQMenuBar::hideItem(YItem* menu_item, bool invisible)
+{
+  YMGAMenuBar::hideItem(menu_item, invisible);
+
+  auto search = d->menu_entry.find( menu_item );
+  if (search != d->menu_entry.end())
+  {
+    QMenu * menu_entry = dynamic_cast<QMenu*>(search->second);
+    if (menu_entry)
+    {
+      menu_entry->menuAction()->setVisible(!invisible);
+
+//       resize( d->menubar->sizeHint() + QSize(20,20));
+//       update();
+
+    }
+    else
+    {
+      QAction * menu_action = dynamic_cast<QAction*>(search->second);
+      if (menu_action)
+        menu_action->setVisible(!invisible);
     }
   }
   else

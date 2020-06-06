@@ -83,6 +83,13 @@ public:
     **/
     virtual void enableItem(YItem * menu_item, bool enable=true);
 
+    /**
+    * Hide YMGAMenuItem (menu name or menu entry) to hide/show it into menubar or menu
+    *
+    * Reimplemented from YMGAMenuBar.
+    **/
+    virtual void hideItem(YItem * menu_item, bool invisible=true);
+
 
 protected:
 
@@ -101,6 +108,7 @@ protected:
 private:
     struct Private;
     Private *d;
+
 };
 
 #endif //YMGAQMenuBar_h
