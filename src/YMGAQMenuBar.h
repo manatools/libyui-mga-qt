@@ -90,6 +90,13 @@ public:
     **/
     virtual void hideItem(YItem * menu_item, bool invisible=true);
 
+    /**
+     * Delete all items.
+     *
+     * Reimplemented from YSelectionWidget
+     **/
+    virtual void deleteAllItems();
+
 
 protected:
 
