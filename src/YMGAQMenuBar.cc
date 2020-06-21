@@ -262,20 +262,23 @@ void YMGAQMenuBar::hideItem(YItem* menu_item, bool invisible)
 
 void YMGAQMenuBar::deleteAllItems()
 {
-  for (MenuEntryMap::iterator it=d->menu_entry.begin(); it!=d->menu_entry.end(); ++it)
-  {
-    QMenu * menu_entry = dynamic_cast<QMenu*>(it->second);
-    if (menu_entry)
-    {
-      d->menubar->removeAction(menu_entry->menuAction());
-    }
-    else
-    {
-      QAction * menu_action = dynamic_cast<QAction*>(it->second);
-      if (menu_action)
-          d->menubar->removeAction(menu_action);
-    }
-  }
+  d->menubar->clear();
+//   for (MenuEntryMap::iterator it=d->menu_entry.begin(); it!=d->menu_entry.end(); ++it)
+//   {
+//     QMenu * menu_entry = dynamic_cast<QMenu*>(it->second);
+//     if (menu_entry)
+//     {
+//       d->menubar->removeAction(menu_entry->menuAction());
+//     }
+//     else
+//     {
+//       QAction * menu_action = dynamic_cast<QAction*>(it->second);
+//       if (menu_action)
+//           d->menubar->removeAction(menu_action);
+//     }
+//   }
+
+  d->menu_entry.clear();
 
   YSelectionWidget::deleteAllItems();
 }
