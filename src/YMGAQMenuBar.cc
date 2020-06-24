@@ -27,6 +27,7 @@
 #include <QMenuBar>
 #include <QHBoxLayout>
 #include <QAction>
+#include <QFileInfo>
 #define YUILogComponent "mga-qt-ui"
 #include <yui/YUILog.h>
 
@@ -109,7 +110,24 @@ void YMGAQMenuBar::addAction(QMenu* menu, YItem* yitem)
   {
     // TODO icon from item
     QItemAction *action = new QItemAction(item, this);
+    if (item->hasIconName())
+    {
+      QString qtIcon = fromUTF8( yitem->iconName() );
+      QString icon_name = QFileInfo( qtIcon ).baseName();
 
+      if ( QIcon::hasThemeIcon( icon_name ) )
+      {
+        action->setIcon( QIcon::fromTheme ( icon_name ) );
+      }
+      else
+      {
+          QPixmap pixmap( qtIcon );
+
+          if ( !pixmap.isNull() )
+              action->setIcon( QIcon( pixmap ) );
+      }
+      action->setIconVisibleInMenu(true);
+    }
     connect(action, &QAction::triggered, action, &QItemAction::selectedItem);
     menu->addAction(action);
 
