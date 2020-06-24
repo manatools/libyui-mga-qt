@@ -102,18 +102,24 @@ void YMGAQMenuBar::addAction(QMenu* menu, YItem* yitem)
   YMenuItem * item = dynamic_cast<YMenuItem *> ( yitem );
   YUI_CHECK_PTR ( item );
 
-  // TODO icon from item
-  QItemAction *action = new QItemAction(item, this);
-
-  connect(action, &QAction::triggered, action, &QItemAction::selectedItem);
-  menu->addAction(action);
-
-  YMGAMenuItem *menuItem = dynamic_cast<YMGAMenuItem *>(yitem);
-  if (menuItem)
+  YMenuSeparator *separator = dynamic_cast<YMenuSeparator *>(yitem);
+  if (separator)
+    menu->addSeparator();
+  else
   {
-    action->setEnabled(menuItem->enabled());
-    d->menu_entry.insert(MenuEntryPair(yitem, action));
-    action->setVisible(!menuItem->hidden());
+    // TODO icon from item
+    QItemAction *action = new QItemAction(item, this);
+
+    connect(action, &QAction::triggered, action, &QItemAction::selectedItem);
+    menu->addAction(action);
+
+    YMGAMenuItem *menuItem = dynamic_cast<YMGAMenuItem *>(yitem);
+    if (menuItem)
+    {
+      action->setEnabled(menuItem->enabled());
+      d->menu_entry.insert(MenuEntryPair(yitem, action));
+      action->setVisible(!menuItem->hidden());
+    }
   }
 
 }
