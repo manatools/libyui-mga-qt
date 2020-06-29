@@ -1,3 +1,7 @@
+Mon Jun 29 19:19:01 CEST 2020 - anaselli@linux.it
+- Added menubar and new menu items implementation
+- 1.1.0
+
 -------------------------------------------------------------------
 Sun Jan 12 15:09:45 CET 2020 - anaselli@linux.it
 - fix issue 1 Using spacebar to uncheck packages does not mark them for deletion
