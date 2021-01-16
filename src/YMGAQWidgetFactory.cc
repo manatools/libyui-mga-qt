@@ -55,9 +55,11 @@ YMGAQWidgetFactory::~YMGAQWidgetFactory()
 
 
 YMGA_CBTable *
-YMGAQWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header, YCBTableMode mode )
+YMGAQWidgetFactory::createCBTable( YWidget * parent, YTableHeader * header )
 {
-    YMGA_QCBTable * table = new YMGA_QCBTable( parent, header, mode );
+    YCBTableHeader *hdr = dynamic_cast<YCBTableHeader *>(header);
+    YUI_CHECK_NEW(hdr);
+    YMGA_QCBTable * table = new YMGA_QCBTable( parent, hdr );
     YUI_CHECK_NEW( table );
 
     return table;
