@@ -1,3 +1,10 @@
+-------------------------------------------------------------------
+Sun Jul 11 16:09:45 CEST 2021 - anaselli@linux.it
+- New YMGA_CBTable implementation
+- built against new libyui tree.
+- 1.2.0
+
+-------------------------------------------------------------------
 Mon Jun 29 19:19:01 CEST 2020 - anaselli@linux.it
 - Added menubar and new menu items implementation
 - 1.1.0
